@@ -52,25 +52,20 @@ To ensure this project remains sustainable, easy to hand off, and practically us
  
 ```text
 guadalupe digital/
-├── backend/                 # .NET 8 Web API
-│   ├── src/
-│   │   ├── GuadalupeDigital.Api/            # Controllers, DI setup, Program.cs
-│   │   ├── GuadalupeDigital.Application/     # Use cases, DTOs, validation
-│   │   ├── GuadalupeDigital.Domain/          # Entities, enums, domain logic
-│   │   └── GuadalupeDigital.Infrastructure/  # EF Core, Blob Storage clients
-│   └── tests/
-├── frontend/                # React (Vite + TypeScript)
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   └── lib/
-│   └── public/
-└── docs/                    # ADRs, diagrams, diocese reporting specs
-```
- 
----
- 
+├── backend/
+│   ├── Features/
+│   │   ├── Students/             # Controllers, DTOs, Queries/Services for Students
+│   │   └── Ingestion/            # Document ingestion pipelines & extraction strategies
+│   ├── Data/
+│   │   ├── AppDbContext.cs       # EF Core context & SnakeCase configuration
+│   │   └── Migrations/           # Database migrations
+│   ├── Common/                   # Shared helpers, middlewares, global filters
+│   ├── Program.cs
+│   └── GuadalupeDigital.csproj
+├── frontend/                     # React (Vite + TypeScript)
+└── docs/                         # Diocese specs, API definitions
+``` 
+
 ## ⚙️ Getting Started
  
 ### Prerequisites
