@@ -1,6 +1,6 @@
-# Digital Guadalupe ⛪
+# Guadalupe Digital ⛪
  
-**Digital Guadalupe** is a web-based administration platform designed to digitize, streamline, and manage student enrollments, document archives, and diocesan metrics for the **Parroquia Nuestra Señora de Guadalupe** in Juan José Ríos, Sinaloa.
+**Guadalupe Digital** is a web-based administration platform designed to digitize, streamline, and manage student enrollments, document archives, and diocesan metrics for the **Parroquia Nuestra Señora de Guadalupe** in Juan José Ríos, Sinaloa.
  
 It replaces paper-based enrollment forms with a centralized digital archive, structured document storage (Blob Storage), and automated statistical reporting for local diocese requirements.
  
@@ -51,13 +51,13 @@ To ensure this project remains sustainable, easy to hand off, and practically us
 ## 📁 Project Structure
  
 ```text
-digital-guadalupe/
+guadalupe digital/
 ├── backend/                 # .NET 8 Web API
 │   ├── src/
-│   │   ├── DigitalGuadalupe.Api/            # Controllers, DI setup, Program.cs
-│   │   ├── DigitalGuadalupe.Application/     # Use cases, DTOs, validation
-│   │   ├── DigitalGuadalupe.Domain/          # Entities, enums, domain logic
-│   │   └── DigitalGuadalupe.Infrastructure/  # EF Core, Blob Storage clients
+│   │   ├── GuadalupeDigital.Api/            # Controllers, DI setup, Program.cs
+│   │   ├── GuadalupeDigital.Application/     # Use cases, DTOs, validation
+│   │   ├── GuadalupeDigital.Domain/          # Entities, enums, domain logic
+│   │   └── GuadalupeDigital.Infrastructure/  # EF Core, Blob Storage clients
 │   └── tests/
 ├── frontend/                # React (Vite + TypeScript)
 │   ├── src/
@@ -83,14 +83,14 @@ digital-guadalupe/
  
 ```bash
 # Clone the repo
-git clone https://github.com/JuanP-VT/digital-guadalupe.git
-cd digital-guadalupe
+git clone https://github.com/JuanP-VT/guadalupe-digital.git
+cd guadalupe-digital
  
 # Backend setup
 cd backend
 dotnet restore
-dotnet ef database update --project src/DigitalGuadalupe.Infrastructure
-dotnet run --project src/DigitalGuadalupe.Api
+dotnet ef database update --project src/GuadalupeDigital.Infrastructure
+dotnet run --project src/GuadalupeDigital.Api
  
 # Frontend setup (in a new terminal)
 cd frontend
