@@ -1,6 +1,6 @@
 ﻿namespace GuadalupeDigital.Infrastructure.Persistance
 {
-    using GuadalupeDigital.Features.Students.DTOs;
+    using GuadalupeDigital.Domain.Students;
     using Microsoft.EntityFrameworkCore;
 
     public class AppDbContext : DbContext
