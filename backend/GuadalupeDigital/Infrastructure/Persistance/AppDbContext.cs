@@ -1,22 +1,23 @@
 ﻿namespace GuadalupeDigital.Infrastructure.Persistance
 {
-    using GuadalupeDigital.Domain.Students;
-    using Microsoft.EntityFrameworkCore;
+	using GuadalupeDigital.Domain.Students;
+	using Microsoft.EntityFrameworkCore;
 
-    public class AppDbContext : DbContext
-    {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+	public class AppDbContext : DbContext
+	{
+		public AppDbContext(DbContextOptions<AppDbContext> options)
+			: base(options) { }
 
-        public DbSet<Student> Students => Set<Student>();
+		public DbSet<Student> Students => Set<Student>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            
-            modelBuilder.Entity<Student>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-            });
-        }
-    }
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<Student>(entity =>
+			{
+				entity.HasKey(e => e.Id);
+			});
+		}
+	}
 }

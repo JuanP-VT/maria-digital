@@ -1,7 +1,6 @@
-﻿namespace GuadalupeDigital.Application
+﻿namespace GuadalupeDigital.Application;
+
+public interface ILLMService
 {
-    public interface ILLMService
-    {
-        public Task<string> GetTextFromImageAsync(byte[] imageBytes);
-    }
+	public Task<string> GetTextFromImageAsync(byte[] imageBytes);
 }
