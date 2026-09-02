@@ -1,6 +1,7 @@
 ﻿namespace GuadalupeDigital.Infrastructure.Persistance
 {
-	using GuadalupeDigital.Domain.Students;
+    using GuadalupeDigital.Domain.Admin;
+    using GuadalupeDigital.Domain.Students;
 	using Microsoft.EntityFrameworkCore;
 
 	public class AppDbContext : DbContext
@@ -18,6 +19,14 @@
 			{
 				entity.HasKey(e => e.Id);
 			});
-		}
+
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+				entity.HasIndex(e => e.Email)
+					.IsUnique();
+            });
+        }
 	}
 }
