@@ -14,11 +14,10 @@ namespace GuadalupeDigital.Application
 		Task<Stream> DownloadAsync(string key, CancellationToken cancellationToken = default);
 
 		// Presigned Url
-		Task<PresignedUpload> GetPresignedPostAsync(
+		Task<string> GetPresignedPutAsync(
 			string key,
-			long fileSize,
-			string contentType,
-			TimeSpan expiresIn,
+            string contentType,
+            TimeSpan expiresIn,
 			CancellationToken cancellationToken = default
 		);
 		Task<PresignedUpload> GetUploadUrlAsync(
