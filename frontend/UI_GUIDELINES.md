@@ -4,17 +4,17 @@ Use these standards for every screen and shared component in Guadalupe Digital. 
 
 ## Theme and Color
 
-Use the semantic CSS variables in `src/index.css`; do not introduce one-off hex colors in components.
+Use the semantic CSS variables in `src/index.css`; do not introduce one-off hex colors in components. The semantic tokens are mapped to Tailwind's built-in palette so shades stay consistent across screens.
 
-- `background` and `foreground`: warm linen page background and charcoal text.
-- `card` and `popover`: clean white elevated surfaces with their paired foreground tokens.
-- `primary`: Marian pine green for primary actions, selected navigation, and key links. Pair with `primary-foreground`.
-- `secondary`: quiet warm-gold surface for secondary actions and supporting emphasis. Pair with `secondary-foreground`.
-- `highlight`: antique gold for sparse status emphasis, seasonal notices, and small decorative details. It is not a default button color.
-- `muted`: supporting surfaces; `muted-foreground`: descriptions, metadata, and helper text.
-- `accent`: pale green interactive hover/selection surface. Pair with `accent-foreground`.
-- `destructive`: reserved for destructive actions and error states.
-- `border`, `input`, and `ring`: consistent dividers, form boundaries, and visible keyboard focus.
+- `background` and `foreground`: `stone-50` page surface and `stone-900` text.
+- `card` and `popover`: `white` surfaces with `stone-900` foregrounds.
+- `primary`: `emerald-800` for primary actions, selected navigation, and key links. Pair with white `primary-foreground`.
+- `secondary`: `amber-100` surface with `amber-950` text for supporting emphasis.
+- `highlight`: `amber-800` for sparse status emphasis and small decorative details. It is not a default button color.
+- `muted` and `muted-foreground`: `stone-100` supporting surfaces and `stone-600` descriptions/metadata.
+- `accent`: `emerald-50` interactive hover/selection surface, paired with `emerald-900` text.
+- `destructive`: `red-700`, reserved for destructive actions and error states.
+- `border` and `input`: `stone-200` dividers and `stone-300` form boundaries. `ring` uses `emerald-700` for visible keyboard focus.
 
 Use `bg-background`, `text-foreground`, `bg-card`, `text-muted-foreground`, `bg-primary`, and the corresponding foreground utilities in components. Keep text readable against its surface; do not lower contrast to make secondary content appear subtle.
 
