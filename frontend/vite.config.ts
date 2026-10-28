@@ -11,4 +11,13 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_PROXY_TARGET ?? 'https://localhost:7028',
+        secure: false,
+        changeOrigin: true,
+      },
+    },
+  },
 })

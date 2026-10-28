@@ -12,6 +12,7 @@ import {
   CircleHelp,
   ClipboardList,
   LayoutDashboard,
+  LogOut,
   MoreHorizontal,
   Plus,
   Search,
@@ -86,12 +87,16 @@ import {
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Textarea } from './components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from './components/ui/tooltip'
+import { AdminAuthGate } from './components/AdminAuthGate'
 import './App.css'
 
-function App() {
+type AdminSession = { displayName: string; email: string }
+
+function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => Promise<void> }) {
   const [activeSection, setActiveSection] = useState('Resumen')
   const [activeTab, setActiveTab] = useState('Todos')
   const [search, setSearch] = useState('')
+  const initials = admin.displayName.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
 
   const navigation = [
     { label: 'Resumen', icon: LayoutDashboard },
@@ -155,9 +160,9 @@ function App() {
           <Button variant="ghost" className="flex min-h-[38px] w-full items-center justify-start gap-[11px] rounded-md px-2.5 text-xs text-muted-foreground"><CircleHelp size={18} strokeWidth={1.8} /><span>Ayuda</span></Button>
           <Button variant="ghost" className="flex min-h-[38px] w-full items-center justify-start gap-[11px] rounded-md px-2.5 text-xs text-muted-foreground"><Settings2 size={18} strokeWidth={1.8} /><span>Configuración</span></Button>
           <div className="mt-3 flex items-center gap-2 border-t border-border px-0.5 pt-3.5">
-            <span className="grid size-[30px] shrink-0 place-items-center rounded-full border border-border bg-accent text-[10px] font-semibold text-primary">PV</span>
-            <span className="flex min-w-0 flex-1 flex-col gap-0.5 [&_strong]:truncate [&_strong]:text-[11px] [&_strong]:font-semibold [&_small]:text-[10px] [&_small]:text-muted-foreground"><strong>Pablo Valdez</strong><small>Administrador</small></span>
-            <MoreHorizontal className="text-muted-foreground" size={18} />
+            <span className="grid size-[30px] shrink-0 place-items-center rounded-full border border-border bg-accent text-[10px] font-semibold text-primary">{initials}</span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5 [&_strong]:truncate [&_strong]:text-[11px] [&_strong]:font-semibold [&_small]:text-[10px] [&_small]:text-muted-foreground"><strong>{admin.displayName}</strong><small>Administrador</small></span>
+            <Button variant="ghost" size="icon-sm" aria-label="Cerrar sesión" title="Cerrar sesión" onClick={() => { void onLogout().catch(() => toast.error('No se pudo cerrar la sesión.')) }}><LogOut size={16} /></Button>
           </div>
         </div>
       </aside>
@@ -170,7 +175,7 @@ function App() {
             <Button variant="ghost" size="icon" className="relative text-muted-foreground" aria-label="Notificaciones">
               <Bell size={18} strokeWidth={1.8} /><span className="absolute top-1.5 right-1.5 size-1.5 rounded-full border border-background bg-highlight" />
             </Button>
-            <span className="grid size-[30px] shrink-0 place-items-center rounded-full border border-border bg-accent text-[10px] font-semibold text-primary">PV</span>
+            <span className="grid size-[30px] shrink-0 place-items-center rounded-full border border-border bg-accent text-[10px] font-semibold text-primary">{initials}</span>
           </div>
         </header>
 
@@ -488,4 +493,10 @@ function App() {
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <AdminAuthGate>
+      {(admin, onLogout) => <Dashboard admin={admin} onLogout={onLogout} />}
+    </AdminAuthGate>
+  )
+}
