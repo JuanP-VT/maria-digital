@@ -112,6 +112,14 @@ VITE_API_BASE_URL="http://localhost:5000/api"
 ```
  
 > ⚠️ Never commit real credentials. Keep `.env` and `appsettings.Development.json` in `.gitignore`.
+
+### Admin Authentication Deployment
+
+The admin dashboard uses an `HttpOnly`, secure session cookie. The frontend and API may run on different providers or in different regions, but production should expose the API under the frontend's origin at `/api/*` using the frontend host's rewrite/proxy feature. The browser then makes same-origin requests while the proxy forwards them to the backend over HTTPS. Do not point browser requests directly at an unrelated API domain; modern browsers may block its cross-site cookies.
+
+Configure the backend's `ConnectionStrings__DefaultConnection` and provision the first admin once with `AdminBootstrap__Email`, `AdminBootstrap__Name`, and `AdminBootstrap__Password` environment variables. The password must be at least 12 characters. Bootstrap creates an account only while the admin table is empty; remove those bootstrap variables after the first successful startup. Configure `Cors__AllowedOrigins__0` only when intentionally serving the frontend from a separate origin, and use HTTPS for both services.
+
+If the backend runs more than one instance, configure ASP.NET Core Data Protection to persist its key ring in shared durable storage accessible to every instance. Keep the application name set to `GuadalupeDigital` (or configure the same `DataProtection__ApplicationName` everywhere). Without shared keys, sessions created by one instance will not be readable by another and will be lost on restarts.
  
 ---
  
