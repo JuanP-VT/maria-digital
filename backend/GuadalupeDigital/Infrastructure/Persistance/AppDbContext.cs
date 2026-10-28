@@ -10,6 +10,7 @@
 			: base(options) { }
 
 		public DbSet<Student> Students => Set<Student>();
+		public DbSet<Admin> Admins => Set<Admin>();
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -22,6 +23,7 @@
 
             modelBuilder.Entity<Admin>(entity =>
             {
+				entity.ToTable("Admin");
                 entity.HasKey(e => e.Id);
 
 				entity.HasIndex(e => e.Email)
