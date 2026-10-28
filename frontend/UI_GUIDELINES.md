@@ -27,7 +27,14 @@ Use `bg-background`, `text-foreground`, `bg-card`, `text-muted-foreground`, `bg-
 
 ## Components and Layout
 
-- Use shadcn/ui components as the baseline for common controls. Add components with `npx shadcn@latest add <component>` and compose them locally; do not duplicate a shared primitive for a single screen.
+- Use the shared components in `src/components/ui` as the baseline. They are shadcn/ui-generated Base UI components, themed through the semantic tokens in `src/index.css`.
+- The starter catalog includes buttons, badges, cards, labels, inputs, textareas, checkboxes, switches, selects, dialogs, destructive confirmation dialogs, dropdown menus, popovers, tooltips, tabs, tables, separators, skeletons, inline alerts, avatars, and Sonner notifications.
+- Add more components from the frontend directory with `npx shadcn@latest add <component>`. Compose shared primitives locally; avoid one-off replacements for a component that already exists.
+- Use `Button` variants consistently: default for the main action, `secondary` or `outline` for supporting actions, `ghost` for low-emphasis controls, and `destructive` only for destructive actions.
+- Use `Dialog` for focused forms or details, `AlertDialog` when a user must confirm a consequential action, and `DropdownMenu` for compact related actions.
+- Use Sonner for transient success, progress, and error feedback. Use `Alert` for persistent inline context or validation that should remain visible.
+- Use `Skeleton` for loading placeholders that preserve the final content shape. Use semantic `Badge` variants for compact statuses, not as the only way to communicate important state.
+- Wrap application content in `TooltipProvider`; use tooltips for icon-only controls that are not self-explanatory. Give those controls an accessible name as well.
 - Use `--radius: 0.5rem` as the base. Keep controls and surfaces moderately rounded; reserve pill shapes for compact status badges when useful.
 - Prefer clear page structure, restrained separators, and compact repeated records over nested cards or decorative containers.
 - Make frequent workflows keyboard-friendly. Preserve a visible `:focus-visible` ring and use semantic buttons, links, labels, and form controls.

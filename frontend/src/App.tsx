@@ -60,7 +60,7 @@ function App() {
           <ChevronDown size={15} aria-hidden="true" />
         </div>
 
-        <span className="sidebar-label">ADMINISTRACIÓN</span>
+        <span className="sidebar-label vr ">ADMINISTRACIÓN</span>
         <nav className="main-nav" aria-label="Navegación principal">
           {navigation.map(({ label, icon: Icon }) => (
             <button
