@@ -1,6 +1,6 @@
 # Backend
 
-.NET 10 ASP.NET Core controllers API in `GuadalupeDigital/`, xUnit tests in `GuadalupeDigital.Tests/`. Commands and testing rules are in the root `CLAUDE.md`.
+.NET 10 ASP.NET Core controllers API in `MariaDigital/`, xUnit tests in `MariaDigital.Tests/`. Commands and testing rules are in the root `CLAUDE.md`.
 
 ## Conventions
 
@@ -13,7 +13,7 @@
 
 ## Database
 
-- EF Core with PostgreSQL (SQLite in tests). Add a migration with `dotnet ef migrations add <Name> --project GuadalupeDigital` from `backend/`, then review the generated files.
+- EF Core with PostgreSQL (SQLite in tests). Add a migration with `dotnet ef migrations add <Name> --project MariaDigital` from `backend/`, then review the generated files.
 - Never hand-edit `Migrations/*.Designer.cs` or `AppDbContextModelSnapshot.cs`.
 
 ## Secrets

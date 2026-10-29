@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MariaDigital.Tests/MariaDigital.Tests.csproj" />
+  <Project Path="MariaDigital/MariaDigital.csproj" />
+</Solution>
