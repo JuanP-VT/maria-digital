@@ -39,5 +39,5 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet tool restore
       - run: dotnet csharpier check .
-      - run: dotnet build GuadalupeDigital.slnx --configuration Release
-      - run: dotnet test GuadalupeDigital.slnx --configuration Release --no-build
+      - run: dotnet build MariaDigital.slnx --configuration Release
+      - run: dotnet test MariaDigital.slnx --configuration Release --no-build

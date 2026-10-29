@@ -94,6 +94,6 @@ coverage/
 /temp/
 
 
-backend/GuadalupeDigital/appsettings.Local.json
+backend/MariaDigital/appsettings.Local.json
 # Claude Code personal settings
 .claude/settings.local.json

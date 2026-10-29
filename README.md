@@ -1,6 +1,6 @@
-# Guadalupe Digital ⛪
+# MariaDigital ⛪
 
-**Guadalupe Digital** is a web-based administration platform designed to digitize, streamline, and manage student enrollments, document archives, and diocesan metrics for the **Parroquia Nuestra Señora de Guadalupe** in Juan José Ríos, Sinaloa.
+**MariaDigital** is a web-based administration platform designed to digitize, streamline, and manage student enrollments, document archives, and diocesan metrics for the **Parroquia Nuestra Señora de Guadalupe** in Juan José Ríos, Sinaloa.
 
 It replaces paper-based enrollment forms with a centralized digital archive, structured document storage (Cloudflare R2), and automated statistical reporting for local diocese requirements.
 
@@ -59,16 +59,16 @@ Design decisions and their reasons are recorded in [`docs/decisions.md`](docs/de
 ## 📁 Project Structure
 
 ```text
-guadalupe-digital/
+maria-digital/
 ├── backend/
-│   ├── GuadalupeDigital/
+│   ├── MariaDigital/
 │   │   ├── Controllers/          # HTTP endpoints
 │   │   ├── Application/          # Interfaces, DTOs, services
 │   │   ├── Domain/               # Entities
 │   │   ├── Infrastructure/       # EF Core DbContext, R2 storage, OpenAI client, options
 │   │   ├── Migrations/           # EF Core migrations (generated)
 │   │   └── Program.cs            # Composition root, auth, CSRF, rate limiting
-│   └── GuadalupeDigital.Tests/   # xUnit tests (integration tests via TestApp)
+│   └── MariaDigital.Tests/   # xUnit tests (integration tests via TestApp)
 ├── frontend/
 │   └── src/
 │       ├── components/           # Feature folders (doc-wizard/) and generated ui/
@@ -94,15 +94,15 @@ AI-agent guidance lives in [`CLAUDE.md`](CLAUDE.md) (plus `backend/CLAUDE.md`, `
 ### Installation
 
 ```bash
-git clone https://github.com/JuanP-VT/guadalupe-digital.git
-cd guadalupe-digital
+git clone https://github.com/JuanP-VT/maria-digital.git
+cd maria-digital
 
 # Backend (https://localhost:7028)
 cd backend
 dotnet tool restore
 dotnet restore
-dotnet ef database update --project GuadalupeDigital
-dotnet run --project GuadalupeDigital --launch-profile https
+dotnet ef database update --project MariaDigital
+dotnet run --project MariaDigital --launch-profile https
 
 # Frontend (in a new terminal, http://localhost:5173)
 cd frontend
@@ -131,7 +131,7 @@ OpenAi__ApiKey="<key>"
 
 ```bash
 cd frontend && npm test
-cd backend && dotnet test GuadalupeDigital.slnx
+cd backend && dotnet test MariaDigital.slnx
 ```
 
 ### Admin Authentication Deployment

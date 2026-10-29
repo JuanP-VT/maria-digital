@@ -1,4 +1,4 @@
-# Guadalupe Digital
+# MariaDigital
 
 Two independent projects: `frontend/` (React 19, Vite, TypeScript, npm) and `backend/` (.NET 10, ASP.NET Core controllers, EF Core + PostgreSQL).
 
@@ -13,7 +13,7 @@ This is a volunteer-run tool for a Spanish-speaking parish (Parroquia Nuestra Se
 
 ## Architecture
 
-- Backend layers in `backend/GuadalupeDigital/`: `Domain` (entities), `Application` (interfaces such as `IObjectStorage` and `ILLMService`, DTOs, services), `Infrastructure` (R2 storage, OpenAI, EF Core `AppDbContext`), `Controllers`. Implementations depend on `Application`, never the reverse.
+- Backend layers in `backend/MariaDigital/`: `Domain` (entities), `Application` (interfaces such as `IObjectStorage` and `ILLMService`, DTOs, services), `Infrastructure` (R2 storage, OpenAI, EF Core `AppDbContext`), `Controllers`. Implementations depend on `Application`, never the reverse.
 - Object storage is Cloudflare R2 (the README still says undecided).
 - Auth is a cookie session for admins (`__Host-Guadalupe.Admin`, HttpOnly, Secure). Mutating `/api` requests require an antiforgery token (checked in `Program.cs` before authentication). A fallback authorization policy makes every endpoint admin-only unless explicitly opened. Login is rate limited.
 - In production the frontend host proxies `/api/*` to the backend so cookies stay same-origin; in dev the Vite proxy does this. Never point the browser at a separate API domain.
@@ -37,8 +37,8 @@ Frontend (run from `frontend/`):
 
 Backend (run from `backend/`):
 
-- `dotnet test GuadalupeDigital.slnx`
-- If the API is running (Visual Studio or `dotnet run`) it locks the Debug build output; run `dotnet test GuadalupeDigital.slnx -c Release` instead.
+- `dotnet test MariaDigital.slnx`
+- If the API is running (Visual Studio or `dotnet run`) it locks the Debug build output; run `dotnet test MariaDigital.slnx -c Release` instead.
 - `dotnet csharpier check .` (formatting; use `format .` to fix)
 
 CI (`.github/workflows/ci.yml`) runs all of the above on every PR and push to `main`.
@@ -65,7 +65,7 @@ Frontend:
 
 Backend:
 
-- Tests live in `backend/GuadalupeDigital.Tests`, mirroring the app's folders.
+- Tests live in `backend/MariaDigital.Tests`, mirroring the app's folders.
 - Integration tests use `TestApp` (`Infrastructure/TestApp.cs`): the real app on in-memory SQLite, with a seeded admin. Create one per test (`new TestApp()`, dispose it) so rate-limit state and data never leak between tests. Use `CreateBrowser()` for a cookie-keeping HTTPS client.
 - Mutating `/api` requests need a CSRF token: `await client.GetCsrfTokenAsync()` and send it as `X-CSRF-TOKEN` (see `PostJsonAsync`). Fetch it before logging in and reuse it, because the CSRF check runs before authentication.
 - SQLite is not PostgreSQL. If a feature depends on Postgres-specific behavior, say so and discuss switching to Testcontainers (needs Docker) rather than working around it.
