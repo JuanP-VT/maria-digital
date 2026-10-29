@@ -92,3 +92,6 @@ coverage/
 *.db
 /uploads/
 /temp/
+
+
+backend/GuadalupeDigital/appsettings.Local.json

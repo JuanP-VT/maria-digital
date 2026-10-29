@@ -80,6 +80,9 @@ builder.Services.AddScoped<IPasswordHasher<Admin>, PasswordHasher<Admin>>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Local overrides (connection string, secrets); optional so the app still starts without it
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+
 // Register PostgreSQL DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
