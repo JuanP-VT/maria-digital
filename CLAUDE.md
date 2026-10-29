@@ -2,6 +2,29 @@
 
 Two independent projects: `frontend/` (React 19, Vite, TypeScript, npm) and `backend/` (.NET 10, ASP.NET Core controllers, EF Core + PostgreSQL).
 
+This is a volunteer-run tool for a Spanish-speaking parish (Parroquia Nuestra Señora de Guadalupe, Sinaloa). User-facing text is in Spanish.
+
+## Principles
+
+- Remove friction: speed of use beats everything (keyboard-first admin entry, mobile-first parent flows).
+- Near-zero running cost: free/low-tier hosting. Do not add paid services or heavy dependencies.
+- Simplicity over complexity: plain EF Core queries, small API contracts, local components. No new abstractions or libraries without a clear need.
+- Gradual digitalization: paper forms, OCR ingestion and online registration coexist. Do not break one to improve another.
+
+## Architecture
+
+- Backend layers in `backend/GuadalupeDigital/`: `Domain` (entities), `Application` (interfaces such as `IObjectStorage` and `ILLMService`, DTOs, services), `Infrastructure` (R2 storage, OpenAI, EF Core `AppDbContext`), `Controllers`. Implementations depend on `Application`, never the reverse.
+- Object storage is Cloudflare R2 (the README still says undecided).
+- Auth is a cookie session for admins (`__Host-Guadalupe.Admin`, HttpOnly, Secure). Mutating `/api` requests require an antiforgery token (checked in `Program.cs` before authentication). A fallback authorization policy makes every endpoint admin-only unless explicitly opened. Login is rate limited.
+- In production the frontend host proxies `/api/*` to the backend so cookies stay same-origin; in dev the Vite proxy does this. Never point the browser at a separate API domain.
+- Data Protection application name must stay `GuadalupeDigital` (see README, "Admin Authentication Deployment").
+
+## Where to look
+
+- `frontend/CLAUDE.md` and `backend/CLAUDE.md`: folder-specific rules, loaded when you work there.
+- `frontend/UI_GUIDELINES.md`: the design system. Read before any UI work.
+- `README.md`: product overview and deployment notes. Parts are outdated (layout, `pnpm`); trust the code and this file.
+
 ## Commands
 
 Frontend (run from `frontend/`):
