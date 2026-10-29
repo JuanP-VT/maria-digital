@@ -15,6 +15,7 @@ import {
   LogOut,
   MoreHorizontal,
   Plus,
+  ScanLine,
   Search,
   Settings2,
   Users,
@@ -88,7 +89,11 @@ import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Textarea } from './components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from './components/ui/tooltip'
 import { AdminAuthGate } from './components/AdminAuthGate'
+import { DocumentWizardPage } from './components/doc-wizard/DocumentWizardPage'
+import { useHashRoute } from './lib/useHashRoute'
 import './App.css'
+
+const DOCUMENT_WIZARD_HASH = '#/subir-documentos'
 
 type AdminSession = { displayName: string; email: string }
 
@@ -103,6 +108,7 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
     { label: 'Estudiantes', icon: Users },
     { label: 'Inscripciones', icon: ClipboardList },
     { label: 'Calendario', icon: CalendarDays },
+    { label: 'Subir documentos', icon: ScanLine, href: DOCUMENT_WIZARD_HASH },
   ]
 
   const swatches = [
@@ -138,7 +144,7 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
 
         <span className="mx-2 mb-2.5 text-[9px] font-semibold tracking-[0.08em] text-muted-foreground max-[760px]:hidden">ADMINISTRACIÓN</span>
         <nav className="main-nav" aria-label="Navegación principal">
-          {navigation.map(({ label, icon: Icon }) => (
+          {navigation.map(({ label, icon: Icon, href }) => (
             <Button
               variant="ghost"
               className={cn(
@@ -146,7 +152,7 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
                 activeSection === label && 'bg-accent font-semibold text-primary',
               )}
               key={label}
-              onClick={() => setActiveSection(label)}
+              onClick={() => { if (href) window.location.hash = href; else setActiveSection(label) }}
               aria-current={activeSection === label ? 'page' : undefined}
             >
               <Icon size={18} strokeWidth={1.8} />
@@ -494,9 +500,11 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
 }
 
 export default function App() {
+  const route = useHashRoute()
+
   return (
     <AdminAuthGate>
-      {(admin, onLogout) => <Dashboard admin={admin} onLogout={onLogout} />}
+      {(admin, onLogout) => route === DOCUMENT_WIZARD_HASH ? <DocumentWizardPage /> : <Dashboard admin={admin} onLogout={onLogout} />}
     </AdminAuthGate>
   )
 }
