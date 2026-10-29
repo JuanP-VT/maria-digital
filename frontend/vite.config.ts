@@ -12,6 +12,10 @@ export default defineConfig({
     },
   },
   server: {
+    // Reachable from a phone on the same network (camera access still needs HTTPS).
+    host: true,
+    // Lets a dev tunnel (e.g. cloudflared) reach the server by its public hostname.
+    allowedHosts: ['.trycloudflare.com'],
     proxy: {
       '/api': {
         target: process.env.VITE_API_PROXY_TARGET ?? 'https://localhost:7028',
