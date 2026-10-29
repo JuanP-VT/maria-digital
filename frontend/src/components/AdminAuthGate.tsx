@@ -97,7 +97,7 @@ export function AdminAuthGate({ children }: AdminAuthGateProps) {
       <section className="auth-panel" aria-labelledby="auth-title">
         <div className="auth-brand">
           <span className="auth-brand-mark"><Church size={22} strokeWidth={1.8} /></span>
-          <span>GUADALUPE <b>DIGITAL</b></span>
+          <span>MARIA <b>DIGITAL</b></span>
         </div>
         <p className="auth-eyebrow">ACCESO DE ADMINISTRACIÓN</p>
         <h1 id="auth-title">Bienvenido de nuevo</h1>

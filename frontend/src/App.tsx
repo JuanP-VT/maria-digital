@@ -131,9 +131,9 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
   return (
     <div className="min-h-screen text-foreground">
       <aside className="sidebar">
-        <a className="flex items-center gap-2.5 px-2 text-foreground no-underline" href="#inicio" aria-label="Guadalupe Digital, inicio">
+        <a className="flex items-center gap-2.5 px-2 text-foreground no-underline" href="#inicio" aria-label="MariaDigital, inicio">
           <span className="grid size-[34px] shrink-0 place-items-center rounded-[10px] bg-primary text-primary-foreground"><Church size={20} strokeWidth={1.8} /></span>
-          <span className="flex flex-col text-sm leading-[1.15] font-semibold">Guadalupe<span className="text-[11px] font-normal text-muted-foreground">Digital</span></span>
+          <span className="flex flex-col text-sm leading-[1.15] font-semibold">Maria<span className="text-[11px] font-normal text-muted-foreground">Digital</span></span>
         </a>
 
         <div className="my-8 flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card px-2 py-2.5 max-[760px]:hidden">
@@ -175,7 +175,7 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
 
       <div className="workspace" id="inicio">
         <header className="topbar">
-          <div className="flex items-center gap-2.5 text-[11px] text-muted-foreground"><span>Guadalupe Digital</span><span>/</span><strong className="font-medium text-foreground">Guía visual</strong></div>
+          <div className="flex items-center gap-2.5 text-[11px] text-muted-foreground"><span>MariaDigital</span><span>/</span><strong className="font-medium text-foreground">Guía visual</strong></div>
           <div className="flex items-center gap-4">
             <span className="text-[11px] text-muted-foreground max-[760px]:hidden">Lunes, 27 de octubre</span>
             <Button variant="ghost" size="icon" className="relative text-muted-foreground" aria-label="Notificaciones">
@@ -492,7 +492,7 @@ function Dashboard({ admin, onLogout }: { admin: AdminSession; onLogout: () => P
             </div>
           </section>
 
-          <footer className="page-footer"><span>GUADALUPE DIGITAL</span><span>Diseñado para servir mejor.</span><span>2026</span></footer>
+          <footer className="page-footer"><span>MARIA DIGITAL</span><span>Diseñado para servir mejor.</span><span>2026</span></footer>
         </main>
       </div>
     </div>

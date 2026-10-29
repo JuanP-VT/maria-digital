@@ -1,6 +1,6 @@
 # Frontend UI Guidelines
 
-Use these standards for every screen and shared component in Guadalupe Digital. Keep the interface calm, clear, and efficient for parish administration and family registration.
+Use these standards for every screen and shared component in MariaDigital. Keep the interface calm, clear, and efficient for parish administration and family registration.
 
 ## Theme and Color
 
