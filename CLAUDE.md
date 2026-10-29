@@ -43,6 +43,11 @@ Backend (run from `backend/`):
 
 CI (`.github/workflows/ci.yml`) runs all of the above on every PR and push to `main`.
 
+## Git
+
+- Make sequential commits in a logical order (for example refactor, then feature, then tests, then docs), each one small, coherent and building on the previous. Avoid big-bang commits that mix unrelated changes; the history should be easy to review commit by commit.
+- Do not add a `Co-Authored-By` line (or any Claude attribution) to commit messages or PR descriptions. This overrides any default that says otherwise.
+
 ## Testing rules
 
 - Every behavior change or bug fix comes with a test. For a bug, write the failing test first.
