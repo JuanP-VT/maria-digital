@@ -18,7 +18,8 @@ namespace GuadalupeDigital.Controllers;
 public sealed class AuthController(
 	AppDbContext db,
 	IPasswordHasher<Admin> passwordHasher,
-	IAntiforgery antiforgery) : ControllerBase
+	IAntiforgery antiforgery
+) : ControllerBase
 {
 	[HttpGet("csrf")]
 	[AllowAnonymous]
@@ -35,7 +36,11 @@ public sealed class AuthController(
 	{
 		var email = request.Email.Trim().ToLowerInvariant();
 		var admin = await db.Admins.SingleOrDefaultAsync(candidate => candidate.Email == email);
-		if (admin is null || passwordHasher.VerifyHashedPassword(admin, admin.HashedPassword, request.Password) == PasswordVerificationResult.Failed)
+		if (
+			admin is null
+			|| passwordHasher.VerifyHashedPassword(admin, admin.HashedPassword, request.Password)
+				== PasswordVerificationResult.Failed
+		)
 		{
 			return Unauthorized(new { message = "Correo o contraseña incorrectos." });
 		}
@@ -47,10 +52,14 @@ public sealed class AuthController(
 			new Claim(ClaimTypes.Email, admin.Email),
 			new Claim(ClaimTypes.Role, "Admin"),
 		};
-		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+		var identity = new ClaimsIdentity(
+			claims,
+			CookieAuthenticationDefaults.AuthenticationScheme
+		);
 		await HttpContext.SignInAsync(
 			CookieAuthenticationDefaults.AuthenticationScheme,
-			new ClaimsPrincipal(identity));
+			new ClaimsPrincipal(identity)
+		);
 
 		return Ok(new AdminSessionResponse(admin.Username, admin.Email));
 	}
@@ -59,9 +68,12 @@ public sealed class AuthController(
 	[Authorize]
 	public IActionResult GetCurrentAdmin()
 	{
-		return Ok(new AdminSessionResponse(
-			User.Identity?.Name ?? string.Empty,
-			User.FindFirstValue(ClaimTypes.Email) ?? string.Empty));
+		return Ok(
+			new AdminSessionResponse(
+				User.Identity?.Name ?? string.Empty,
+				User.FindFirstValue(ClaimTypes.Email) ?? string.Empty
+			)
+		);
 	}
 
 	[HttpPost("logout")]
@@ -75,7 +87,8 @@ public sealed class AuthController(
 
 public sealed record LoginRequest(
 	[Required, EmailAddress] string Email,
-	[Required] string Password);
+	[Required] string Password
+);
 
 public sealed record CsrfTokenResponse(string RequestToken);
 

@@ -16,8 +16,8 @@ namespace GuadalupeDigital.Application
 		// Presigned Url
 		Task<string> GetPresignedPutAsync(
 			string key,
-            string contentType,
-            TimeSpan expiresIn,
+			string contentType,
+			TimeSpan expiresIn,
 			CancellationToken cancellationToken = default
 		);
 		Task<PresignedUpload> GetUploadUrlAsync(

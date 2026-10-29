@@ -2,8 +2,8 @@ using System.Security.Claims;
 using System.Threading.RateLimiting;
 using GuadalupeDigital.Domain.Admin;
 using GuadalupeDigital.Infrastructure.Persistance;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -15,14 +15,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddCors(options => options.AddPolicy("Frontend", policy =>
-{
-	var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
-	policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-}));
+builder.Services.AddCors(options =>
+	options.AddPolicy(
+		"Frontend",
+		policy =>
+		{
+			var origins =
+				builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+			policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+		}
+	)
+);
 
-builder.Services
-	.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+builder
+	.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(options =>
 	{
 		options.Cookie.Name = "__Host-Guadalupe.Admin";
@@ -43,8 +49,11 @@ builder.Services
 			return Task.CompletedTask;
 		};
 	});
-builder.Services.AddDataProtection()
-	.SetApplicationName(builder.Configuration["DataProtection:ApplicationName"] ?? "GuadalupeDigital");
+builder
+	.Services.AddDataProtection()
+	.SetApplicationName(
+		builder.Configuration["DataProtection:ApplicationName"] ?? "GuadalupeDigital"
+	);
 
 builder.Services.AddAuthorization(options =>
 {
@@ -64,15 +73,20 @@ builder.Services.AddAntiforgery(options =>
 });
 builder.Services.AddRateLimiter(options =>
 {
-	options.AddPolicy("login", context => RateLimitPartition.GetFixedWindowLimiter(
-		context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-		_ => new FixedWindowRateLimiterOptions
-		{
-			PermitLimit = 5,
-			Window = TimeSpan.FromMinutes(1),
-			QueueLimit = 0,
-			AutoReplenishment = true,
-		}));
+	options.AddPolicy(
+		"login",
+		context =>
+			RateLimitPartition.GetFixedWindowLimiter(
+				context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+				_ => new FixedWindowRateLimiterOptions
+				{
+					PermitLimit = 5,
+					Window = TimeSpan.FromMinutes(1),
+					QueueLimit = 0,
+					AutoReplenishment = true,
+				}
+			)
+	);
 	options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 builder.Services.AddScoped<IPasswordHasher<Admin>, PasswordHasher<Admin>>();
@@ -94,17 +108,26 @@ var bootstrapName = app.Configuration["AdminBootstrap:Name"];
 var bootstrapPassword = app.Configuration["AdminBootstrap:Password"];
 if (bootstrapEmail is not null || bootstrapName is not null || bootstrapPassword is not null)
 {
-	if (string.IsNullOrWhiteSpace(bootstrapEmail) || string.IsNullOrWhiteSpace(bootstrapName) ||
-		string.IsNullOrWhiteSpace(bootstrapPassword))
+	if (
+		string.IsNullOrWhiteSpace(bootstrapEmail)
+		|| string.IsNullOrWhiteSpace(bootstrapName)
+		|| string.IsNullOrWhiteSpace(bootstrapPassword)
+	)
 	{
-		throw new InvalidOperationException("Admin bootstrap requires an email, a name, and a password of at least 12 characters.");
+		throw new InvalidOperationException(
+			"Admin bootstrap requires an email, a name, and a password of at least 12 characters."
+		);
 	}
 
 	await using var scope = app.Services.CreateAsyncScope();
 	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 	if (!await db.Admins.AnyAsync())
 	{
-		var admin = new Admin(bootstrapName.Trim(), string.Empty, bootstrapEmail.Trim().ToLowerInvariant());
+		var admin = new Admin(
+			bootstrapName.Trim(),
+			string.Empty,
+			bootstrapEmail.Trim().ToLowerInvariant()
+		);
 		var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<Admin>>();
 		admin.SetHashedPassword(hasher.HashPassword(admin, bootstrapPassword));
 		db.Admins.Add(admin);
@@ -122,26 +145,33 @@ app.UseHttpsRedirection();
 
 app.UseCors("Frontend");
 app.UseRateLimiter();
-app.Use(async (context, next) =>
-{
-	var isMutation = HttpMethods.IsPost(context.Request.Method) || HttpMethods.IsPut(context.Request.Method) ||
-		HttpMethods.IsPatch(context.Request.Method) || HttpMethods.IsDelete(context.Request.Method);
-	if (isMutation && context.Request.Path.StartsWithSegments("/api"))
+app.Use(
+	async (context, next) =>
 	{
-		try
+		var isMutation =
+			HttpMethods.IsPost(context.Request.Method)
+			|| HttpMethods.IsPut(context.Request.Method)
+			|| HttpMethods.IsPatch(context.Request.Method)
+			|| HttpMethods.IsDelete(context.Request.Method);
+		if (isMutation && context.Request.Path.StartsWithSegments("/api"))
 		{
-			await context.RequestServices.GetRequiredService<IAntiforgery>().ValidateRequestAsync(context);
+			try
+			{
+				await context
+					.RequestServices.GetRequiredService<IAntiforgery>()
+					.ValidateRequestAsync(context);
+			}
+			catch (AntiforgeryValidationException)
+			{
+				context.Response.StatusCode = StatusCodes.Status400BadRequest;
+				await context.Response.WriteAsJsonAsync(new { message = "Invalid CSRF token." });
+				return;
+			}
 		}
-		catch (AntiforgeryValidationException)
-		{
-			context.Response.StatusCode = StatusCodes.Status400BadRequest;
-			await context.Response.WriteAsJsonAsync(new { message = "Invalid CSRF token." });
-			return;
-		}
-	}
 
-	await next();
-});
+		await next();
+	}
+);
 
 app.UseAuthentication();
 app.UseAuthorization();
