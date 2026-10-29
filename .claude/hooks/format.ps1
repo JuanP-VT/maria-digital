@@ -8,8 +8,8 @@ $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $full = (Resolve-Path -LiteralPath $file).Path
 $rel = $full.Substring($root.Length).TrimStart([char]92, '/').Replace([string][char]92, '/')
 
-# CSharpier: only the Tests project, matching the CI check (older app code predates CSharpier).
-if ($rel -like 'backend/GuadalupeDigital.Tests/*.cs') {
+# CSharpier: all backend C# except generated migrations (see backend/.csharpierignore).
+if ($rel -like 'backend/*.cs' -and $rel -notlike 'backend/*/Migrations/*') {
 	Push-Location (Join-Path $root 'backend')
 	dotnet csharpier format $full | Out-Null
 	Pop-Location

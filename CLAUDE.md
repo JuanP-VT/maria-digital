@@ -23,7 +23,9 @@ This is a volunteer-run tool for a Spanish-speaking parish (Parroquia Nuestra Se
 
 - `frontend/CLAUDE.md` and `backend/CLAUDE.md`: folder-specific rules, loaded when you work there.
 - `frontend/UI_GUIDELINES.md`: the design system. Read before any UI work.
-- `README.md`: product overview and deployment notes. Parts are outdated (layout, `pnpm`); trust the code and this file.
+- `README.md`: product overview, setup and deployment notes.
+- `docs/decisions.md`: why things are the way they are. Read before proposing to change storage, auth, routing or the test approach; add an entry when you make a similar decision.
+- `.claude/skills/`: step-by-step recipes (`add-ef-migration`, `add-endpoint`, `add-wizard-step`).
 
 ## Commands
 
@@ -37,7 +39,7 @@ Backend (run from `backend/`):
 
 - `dotnet test GuadalupeDigital.slnx`
 - If the API is running (Visual Studio or `dotnet run`) it locks the Debug build output; run `dotnet test GuadalupeDigital.slnx -c Release` instead.
-- `dotnet csharpier check GuadalupeDigital.Tests` (formatting; use `format` to fix)
+- `dotnet csharpier check .` (formatting; use `format .` to fix)
 
 CI (`.github/workflows/ci.yml`) runs all of the above on every PR and push to `main`.
 
@@ -45,6 +47,8 @@ CI (`.github/workflows/ci.yml`) runs all of the above on every PR and push to `m
 
 - Every behavior change or bug fix comes with a test. For a bug, write the failing test first.
 - Run the relevant suite before saying work is done, and report failures as they are. Never delete or weaken a test to make it pass.
+- Write code to be testable and keep coverage high. Extract logic into small pure functions (input in, result out) instead of large methods or components that mix logic with I/O, rendering or framework wiring. Controllers, services and components stay thin and delegate to those functions.
+- Default answer to "should this be tested?" is yes. Skip a test only when it would merely restate the framework or the code (a trivial getter, a DTO, a one-line pass-through), or when the file is generated (`components/ui/**`, EF migrations). When you skip, say so and why in your summary. Anything with a branch, a calculation, validation, a security rule or a user-visible state change gets a test.
 - Tests never touch the real network, the real database, OpenAI or R2. Mock external services (`ILLMService`, `IObjectStorage`, `fetch`).
 
 Frontend:

@@ -4,7 +4,8 @@
 
 ## Conventions
 
-- Format with CSharpier (`.csharpierrc.json`: tabs, width 100). CI currently checks only the Tests project because older app code predates CSharpier; a hook in `.claude/settings.json` auto-formats edited files in the Tests project only. Do not reformat unrelated app code in a feature change.
+- Format with CSharpier (`.csharpierrc.json`: tabs, width 100). All code is formatted except `Migrations/` (`.csharpierignore`). A hook in `.claude/settings.json` formats edited `.cs` files, and CI runs `dotnet csharpier check .`.
+- Keep logic in small, pure, unit-testable methods; controllers and services stay thin (see the root `CLAUDE.md` testing rules).
 - Nullable reference types are on; keep it warning-free.
 - Layering: entities in `Domain`, interfaces and DTOs in `Application`, implementations in `Infrastructure`. Register services in `Program.cs`.
 - New endpoint: controller in `Controllers/`, request/response DTOs in `Application/DTOs`, logic in an `Application/Services` class when it is more than a trivial query. Endpoints are admin-only by default; opening one to the public needs an explicit decision and an update to `EndpointSecurityTests`.
