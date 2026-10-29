@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { WIZARD_STEPS, type WizardStep } from './config'
 import { ImageViewer } from './ImageViewer'
-import { capturedCount } from './progress'
+import { capturedCount, missingRequiredSteps } from './progress'
 import type { Slot } from './types'
 import { useObjectUrl } from './useObjectUrl'
 
@@ -78,7 +78,7 @@ export function PreviewScreen({ slots, studentNumber, saving, onRetake, onSave, 
   const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
-  const missingRequired = WIZARD_STEPS.filter((step, index) => step.required && slots[index].status !== 'captured')
+  const missingRequired = missingRequiredSteps(WIZARD_STEPS, slots)
 
   function handleSave() {
     if (missingRequired.length > 0) setConfirmOpen(true)

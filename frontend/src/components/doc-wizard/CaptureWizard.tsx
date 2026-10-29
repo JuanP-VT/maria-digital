@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { fileToPhoto, frameToPhoto, type ProcessedPhoto } from '@/lib/image'
 import { toast } from 'sonner'
 import { WIZARD_STEPS } from './config'
+import { describeFlags } from './progress'
 import { StepHeader } from './StepHeader'
 import type { Draft, QualityFlag } from './types'
 import { useCamera } from './useCamera'
@@ -20,11 +21,6 @@ type CaptureWizardProps = {
   onGoTo: (index: number) => void
   onAdvance: (from: number) => void
   onExit: () => void
-}
-
-function describeFlags(flags: QualityFlag[]) {
-  if (flags.includes('blur') && flags.includes('dark')) return 'La foto se ve borrosa y oscura.'
-  return flags.includes('blur') ? 'La foto se ve borrosa.' : 'La foto se ve oscura.'
 }
 
 export function CaptureWizard({ draft, studentNumber, onCapture, onSkip, onGoTo, onAdvance, onExit }: CaptureWizardProps) {
