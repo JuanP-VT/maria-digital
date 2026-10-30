@@ -1,0 +1,22 @@
+name = "guadalupe-upload-confirmer"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[observability]
+enabled = true
+
+[vars]
+# Public origin of the API, no trailing path. Replace before deploying.
+API_BASE_URL = "https://api.example.org"
+
+# The shared HMAC secret is NOT stored here. Set it with:
+#   npx wrangler secret put UPLOAD_WEBHOOK_SECRET
+# and give the backend the same value as UploadWebhook__Secret.
+
+[[queues.consumers]]
+queue = "guadalupe-uploads"
+max_batch_size = 10
+max_batch_timeout = 5
+# After this many failed attempts the message moves to the dead-letter queue instead of vanishing.
+max_retries = 8
+dead_letter_queue = "guadalupe-uploads-dlq"
