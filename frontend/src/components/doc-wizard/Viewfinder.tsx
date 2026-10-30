@@ -39,8 +39,9 @@ export function Viewfinder({ videoRef, stream, status, hintText, torchSupported,
       />
 
       {stream && (
-        <div className="pointer-events-none absolute inset-0 grid place-items-center" aria-hidden="true">
-          <div className="aspect-[1/1.414] h-[68%] max-w-[88%] rounded-md border-2 border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+        <div className="pointer-events-none absolute inset-0 grid place-items-center [container-type:size]" aria-hidden="true">
+          {/* The photo is cropped to this rectangle (lib/guideCrop.ts): 68% tall, A4 ratio, at most 88% wide. */}
+          <div className="aspect-[1/1.414] h-[min(68cqh,124.4cqw)] rounded-md border-2 border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
         </div>
       )}
 

@@ -1,4 +1,5 @@
 import type { QualityFlag } from '@/components/doc-wizard/types'
+import { guideCropInVideo, type CropRect } from './guideCrop'
 
 // Output size/quality of stored photos.
 const MAX_EDGE = 1800
@@ -11,14 +12,15 @@ const BLUR_LAPLACIAN_VARIANCE = 30
 
 export type ProcessedPhoto = { blob: Blob; flags: QualityFlag[] }
 
-type Source = { image: CanvasImageSource; width: number; height: number }
+type Source = { image: CanvasImageSource; width: number; height: number; crop?: CropRect }
 
-function drawScaled({ image, width, height }: Source, maxEdge: number) {
-  const scale = Math.min(1, maxEdge / Math.max(width, height))
+function drawScaled({ image, width, height, crop }: Source, maxEdge: number) {
+  const area = crop ?? { x: 0, y: 0, width, height }
+  const scale = Math.min(1, maxEdge / Math.max(area.width, area.height))
   const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(width * scale))
-  canvas.height = Math.max(1, Math.round(height * scale))
-  canvas.getContext('2d')!.drawImage(image, 0, 0, canvas.width, canvas.height)
+  canvas.width = Math.max(1, Math.round(area.width * scale))
+  canvas.height = Math.max(1, Math.round(area.height * scale))
+  canvas.getContext('2d')!.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, canvas.width, canvas.height)
   return canvas
 }
 
@@ -68,8 +70,12 @@ async function process(source: Source): Promise<ProcessedPhoto> {
   return { blob: await toBlob(canvas), flags }
 }
 
+/** Captures only the part of the live video inside the on-screen guide, at full camera resolution. */
 export function frameToPhoto(video: HTMLVideoElement) {
-  return process({ image: video, width: video.videoWidth, height: video.videoHeight })
+  const source = { image: video, width: video.videoWidth, height: video.videoHeight }
+  const box = { width: video.clientWidth, height: video.clientHeight }
+  const crop = box.width && box.height ? guideCropInVideo(source, box) : undefined
+  return process({ ...source, crop })
 }
 
 async function decodeFile(file: Blob): Promise<Source> {
