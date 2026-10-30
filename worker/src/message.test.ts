@@ -3,7 +3,7 @@ import { parseMessage } from './message'
 
 const event = (action: string, key = 'submissions/abc/registration/def', size = 5000) => ({
   account: 'acc',
-  bucket: 'digital-guadalupe-docs',
+  bucket: 'guadalupe-archive',
   action,
   object: { key, size, eTag: 'x' },
   eventTime: '2026-10-29T12:00:00Z',

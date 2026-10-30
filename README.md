@@ -122,7 +122,7 @@ ConnectionStrings__DefaultConnection="Host=localhost;Database=digital_guadalupe;
 R2__AccountId="<account-id>"
 R2__AccessKeyId="<access-key-id>"
 R2__SecretAccessKey="<secret>"
-R2__BucketName="digital-guadalupe-docs"
+R2__BucketName="guadalupe-archive"
 UploadWebhook__Secret="<at least 32 random characters, same value as the Worker's secret>"
 OpenAi__ApiKey="<key>"
 ```
@@ -147,7 +147,7 @@ One-time setup (from `worker/`, with `npx wrangler login` done):
 npm ci
 npx wrangler queues create guadalupe-uploads-dlq
 npx wrangler queues create guadalupe-uploads
-npx wrangler r2 bucket notification create digital-guadalupe-docs --event-type object-create --queue guadalupe-uploads --prefix submissions/
+npx wrangler r2 bucket notification create guadalupe-archive --event-type object-create --queue guadalupe-uploads --prefix submissions/
 npx wrangler secret put UPLOAD_WEBHOOK_SECRET   # same value as the backend's UploadWebhook__Secret
 # set API_BASE_URL in wrangler.toml, then:
 npx wrangler deploy
