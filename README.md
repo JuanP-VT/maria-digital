@@ -74,6 +74,7 @@ maria-digital/
 │       ├── components/           # Feature folders (doc-wizard/) and generated ui/
 │       ├── lib/                  # Shared helpers and hooks
 │       └── test/                 # Vitest setup
+├── worker/                       # Cloudflare Worker: R2 upload events (Queue) -> backend webhook
 ├── docs/                         # Decision log
 └── .github/workflows/ci.yml      # Lint, test, build on every PR and push to main
 ```
@@ -122,6 +123,7 @@ R2__AccountId="<account-id>"
 R2__AccessKeyId="<access-key-id>"
 R2__SecretAccessKey="<secret>"
 R2__BucketName="digital-guadalupe-docs"
+UploadWebhook__Secret="<at least 32 random characters, same value as the Worker's secret>"
 OpenAi__ApiKey="<key>"
 ```
 
@@ -132,7 +134,26 @@ OpenAi__ApiKey="<key>"
 ```bash
 cd frontend && npm test
 cd backend && dotnet test MariaDigital.slnx
+cd worker && npm test
 ```
+
+### Upload Confirmation Worker Deployment
+
+Browsers upload straight to R2 with presigned URLs, which leaves the `StudentDocument` row `Pending`. R2 reports every created object to a Cloudflare Queue, and the Worker in `worker/` reads that queue and calls `POST /api/internal/uploads/confirmed` on the backend, which flips the row to `Uploaded`. Delivery is at-least-once, so the endpoint is idempotent. The Worker retries with exponential backoff (a sleeping free-tier backend gets time to wake) and, after 8 attempts, moves the message to a dead-letter queue instead of losing it.
+
+One-time setup (from `worker/`, with `npx wrangler login` done):
+
+```bash
+npm ci
+npx wrangler queues create guadalupe-uploads-dlq
+npx wrangler queues create guadalupe-uploads
+npx wrangler r2 bucket notification create digital-guadalupe-docs --event-type object-create --queue guadalupe-uploads --prefix submissions/
+npx wrangler secret put UPLOAD_WEBHOOK_SECRET   # same value as the backend's UploadWebhook__Secret
+# set API_BASE_URL in wrangler.toml, then:
+npx wrangler deploy
+```
+
+`API_BASE_URL` can be the frontend origin: the host already proxies `/api/*` to the backend. Requests are signed with HMAC-SHA256 over `{timestamp}.{body}` and rejected after 5 minutes, and the endpoint is closed (503) until `UploadWebhook__Secret` is set. To replay messages that reached the dead-letter queue (for example after a wrong secret), attach a consumer to `guadalupe-uploads-dlq` temporarily or move them back with the Cloudflare dashboard.
 
 ### Admin Authentication Deployment
 
