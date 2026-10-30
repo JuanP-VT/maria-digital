@@ -61,6 +61,35 @@ describe('PreviewScreen', () => {
     expect(onRetake).toHaveBeenCalledWith(1)
   })
 
+  describe('while uploading', () => {
+    function setupSaving(progress: { done: number; total: number } | null) {
+      const props = { onRetake: vi.fn(), onSave: vi.fn(), onExit: vi.fn() }
+      render(<PreviewScreen slots={slotsWith(ALL_REQUIRED)} studentNumber={1} saving progress={progress} {...props} />)
+      return props
+    }
+
+    it('shows the progress and blocks every control that would change the draft', () => {
+      setupSaving({ done: 1, total: 3 })
+      expect(screen.getByRole('button', { name: /Subiendo 2 de 3/ })).toBeDisabled()
+      expect(screen.getByRole('progressbar', { name: 'Subiendo documentos' })).toHaveAttribute('aria-valuenow', '1')
+      expect(screen.getByRole('button', { name: 'Salir' })).toBeDisabled()
+      for (const button of screen.getAllByRole('button', { name: /Capturar|Repetir/ })) expect(button).toBeDisabled()
+    })
+
+    it('shows a preparing state before the first progress update', () => {
+      setupSaving(null)
+      expect(screen.getByRole('button', { name: /Preparando/ })).toBeDisabled()
+    })
+  })
+
+  it('offers a retry after a failed save', async () => {
+    const onSave = vi.fn()
+    render(<PreviewScreen slots={slotsWith(ALL_REQUIRED)} studentNumber={1} saving={false} failed onRetake={vi.fn()} onSave={onSave} onExit={vi.fn()} />)
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
+    expect(onSave).toHaveBeenCalledOnce()
+  })
+
   it('does not require the optional document', async () => {
     const { onSave } = setup([...ALL_REQUIRED, 'empty'])
     await userEvent.click(screen.getByRole('button', { name: 'Guardar estudiante' }))

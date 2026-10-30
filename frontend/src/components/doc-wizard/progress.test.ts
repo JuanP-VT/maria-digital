@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { WizardStep } from './config'
-import { capturedCount, describeFlags, missingRequiredSteps } from './progress'
+import { capturedCount, describeFlags, missingRequiredSteps, saveButtonLabel, uploadFilesFromSlots } from './progress'
 import type { Slot } from './types'
 
 const slot = (status: Slot['status']): Slot => ({ docType: 'x', status, qualityFlags: [] })
@@ -33,6 +33,33 @@ describe('missingRequiredSteps', () => {
 
   it('treats a missing slot as missing', () => {
     expect(missingRequiredSteps(steps, [slot('captured')]).map((step) => step.id)).toEqual(['b'])
+  })
+})
+
+describe('uploadFilesFromSlots', () => {
+  const blob = new Blob(['x'], { type: 'image/jpeg' })
+
+  it('keeps captured slots with their doc type and drops skipped, empty and imageless ones', () => {
+    const slots: Slot[] = [
+      { docType: 'registration', status: 'captured', image: blob, qualityFlags: [] },
+      { docType: 'birth', status: 'skipped', qualityFlags: [] },
+      { docType: 'baptism', status: 'empty', qualityFlags: [] },
+      { docType: 'address', status: 'captured', qualityFlags: [] },
+    ]
+    expect(uploadFilesFromSlots(slots)).toEqual([{ type: 'registration', blob }])
+  })
+})
+
+describe('saveButtonLabel', () => {
+  it('shows the file being uploaded, never past the total', () => {
+    expect(saveButtonLabel(true, false, null)).toBe('Preparando…')
+    expect(saveButtonLabel(true, false, { done: 0, total: 3 })).toBe('Subiendo 1 de 3…')
+    expect(saveButtonLabel(true, false, { done: 3, total: 3 })).toBe('Subiendo 3 de 3…')
+  })
+
+  it('offers a retry after a failure and the normal label otherwise', () => {
+    expect(saveButtonLabel(false, true, null)).toBe('Reintentar')
+    expect(saveButtonLabel(false, false, null)).toBe('Guardar estudiante')
   })
 })
 

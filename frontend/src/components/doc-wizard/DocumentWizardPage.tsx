@@ -3,28 +3,25 @@ import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CaptureWizard } from './CaptureWizard'
 import { PreviewScreen } from './PreviewScreen'
+import { saveStudent, type UploadProgress } from './saveStudent'
 import { StartScreen } from './StartScreen'
 import type { Student } from './types'
 import { useStudentDraft } from './useStudentDraft'
 import { useWakeLock } from './useWakeLock'
 
 type DocumentWizardPageProps = {
-  onSave?: (student: Student) => void | Promise<void>
-}
-
-// Stub until the upload endpoint exists.
-function saveStudentStub(student: Student) {
-  console.info('Estudiante guardado (simulado)', student)
-  toast.success('Estudiante guardado')
+  onSave?: (student: Student, onProgress: (progress: UploadProgress) => void) => unknown | Promise<unknown>
 }
 
 function exitWizard() {
   window.location.hash = ''
 }
 
-export function DocumentWizardPage({ onSave = saveStudentStub }: DocumentWizardPageProps) {
+export function DocumentWizardPage({ onSave = saveStudent }: DocumentWizardPageProps) {
   const wizard = useStudentDraft()
   const [saving, setSaving] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [progress, setProgress] = useState<UploadProgress | null>(null)
   const { draft } = wizard
 
   useWakeLock(draft !== null)
@@ -32,13 +29,18 @@ export function DocumentWizardPage({ onSave = saveStudentStub }: DocumentWizardP
   async function handleSave() {
     if (!draft) return
     setSaving(true)
+    setFailed(false)
+    setProgress(null)
     try {
-      await onSave(draft.student)
+      await onSave(draft.student, setProgress)
+      toast.success('Estudiante guardado')
       wizard.finish()
-    } catch {
-      toast.error('No se pudo guardar el estudiante. Intenta de nuevo.')
+    } catch (error) {
+      setFailed(true)
+      toast.error(error instanceof Error ? error.message : 'No se pudo guardar el estudiante. Intenta de nuevo.')
     } finally {
       setSaving(false)
+      setProgress(null)
     }
   }
 
@@ -58,6 +60,8 @@ export function DocumentWizardPage({ onSave = saveStudentStub }: DocumentWizardP
         slots={draft.student.slots}
         studentNumber={wizard.studentNumber}
         saving={saving}
+        failed={failed}
+        progress={progress}
         onRetake={wizard.retake}
         onSave={() => void handleSave()}
         onExit={exitWizard}
