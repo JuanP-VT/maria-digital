@@ -61,6 +61,33 @@ describe('uploads', () => {
     await expect(uploadDocuments([{ type: 'birth', blob: jpeg(1) }])).rejects.toThrow(message)
   })
 
+  it('reports progress as each file finishes', async () => {
+    mockFetch({
+      '/api/auth/csrf': () => json({ requestToken: 't' }),
+      '/api/uploads/presign': () => json({
+        submissionId: 's1',
+        uploads: [
+          { type: 'birth', url: 'https://storage.test/a', headers: {} },
+          { type: 'baptism', url: 'https://storage.test/b', headers: {} },
+        ],
+      }),
+      'https://storage.test/a': () => new Response(null, { status: 200 }),
+      'https://storage.test/b': () => new Response(null, { status: 200 }),
+    })
+    const onProgress = vi.fn()
+
+    await uploadDocuments([{ type: 'birth', blob: jpeg(1) }, { type: 'baptism', blob: jpeg(1) }], onProgress)
+
+    expect(onProgress.mock.calls).toEqual([[0, 2], [1, 2], [2, 2]])
+  })
+
+  it('shows an offline message when a request never reaches the server', async () => {
+    vi.stubGlobal('fetch', vi.fn((url: string) =>
+      url === '/api/auth/csrf' ? Promise.resolve(json({ requestToken: 't' })) : Promise.reject(new TypeError('Failed to fetch'))))
+
+    await expect(uploadDocuments([{ type: 'birth', blob: jpeg(1) }])).rejects.toThrow(/sin conexión/i)
+  })
+
   it('fails when storage rejects the upload', async () => {
     mockFetch({
       '/api/auth/csrf': () => json({ requestToken: 't' }),
