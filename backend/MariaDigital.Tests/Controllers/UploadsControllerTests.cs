@@ -59,6 +59,17 @@ public sealed class UploadsControllerTests : IDisposable
 	}
 
 	[Fact]
+	public async Task A_csrf_token_fetched_while_logged_in_is_accepted()
+	{
+		await _client.LoginAsync();
+		var csrf = await _client.GetCsrfTokenAsync();
+
+		var response = await _client.PostJsonAsync(Url, ValidRequest(), csrf);
+
+		Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+	}
+
+	[Fact]
 	public async Task Admin_gets_presigned_urls_and_pending_rows_are_stored()
 	{
 		var csrf = await _client.GetCsrfTokenAsync();

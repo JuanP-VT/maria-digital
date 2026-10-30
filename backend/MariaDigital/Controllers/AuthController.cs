@@ -25,8 +25,19 @@ public sealed class AuthController(
 	[AllowAnonymous]
 	public IActionResult GetCsrfToken()
 	{
-		var tokens = antiforgery.GetAndStoreTokens(HttpContext);
-		return Ok(new CsrfTokenResponse(tokens.RequestToken!));
+		// The CSRF check in Program.cs runs before authentication, so it always sees an anonymous user.
+		// A token bound to the logged-in admin would be rejected there; issue it as anonymous.
+		var user = HttpContext.User;
+		HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity());
+		try
+		{
+			var tokens = antiforgery.GetAndStoreTokens(HttpContext);
+			return Ok(new CsrfTokenResponse(tokens.RequestToken!));
+		}
+		finally
+		{
+			HttpContext.User = user;
+		}
 	}
 
 	[HttpPost("login")]
