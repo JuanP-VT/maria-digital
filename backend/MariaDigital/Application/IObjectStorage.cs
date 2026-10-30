@@ -14,9 +14,14 @@ namespace MariaDigital.Application
 		Task<Stream> DownloadAsync(string key, CancellationToken cancellationToken = default);
 
 		// Presigned Url
+		/// <summary>
+		/// URL that accepts exactly one PUT of <paramref name="sizeBytes"/> bytes with this content type.
+		/// The signature covers both, so storage rejects any other type or length.
+		/// </summary>
 		Task<string> GetPresignedPutAsync(
 			string key,
 			string contentType,
+			long sizeBytes,
 			TimeSpan expiresIn,
 			CancellationToken cancellationToken = default
 		);

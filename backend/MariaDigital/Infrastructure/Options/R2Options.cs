@@ -7,5 +7,11 @@
 		public required string AccessKeyId { get; init; }
 		public required string SecretAccessKey { get; init; }
 		public required string BucketName { get; init; }
+
+		public static bool IsComplete(R2Options options) =>
+			!string.IsNullOrWhiteSpace(options.AccountId)
+			&& !string.IsNullOrWhiteSpace(options.AccessKeyId)
+			&& !string.IsNullOrWhiteSpace(options.SecretAccessKey)
+			&& !string.IsNullOrWhiteSpace(options.BucketName);
 	}
 }

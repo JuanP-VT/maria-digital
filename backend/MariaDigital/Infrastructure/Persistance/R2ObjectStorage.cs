@@ -34,38 +34,25 @@ public sealed class R2ObjectStorage : IObjectStorage
 		throw new NotImplementedException();
 	}
 
-	public Task<PresignedUpload> GetPresignedPutAsync(
-		string key,
-		long fileSize,
-		string contentType,
-		TimeSpan expiresIn,
-		CancellationToken cancellationToken = default
-	)
-	{
-		throw new NotImplementedException();
-	}
-
 	public Task<string> GetPresignedPutAsync(
 		string key,
 		string contentType,
+		long sizeBytes,
 		TimeSpan expiresIn,
 		CancellationToken cancellationToken = default
 	)
 	{
-		var expiresAt = DateTimeOffset.UtcNow.Add(expiresIn);
-
 		var request = new GetPreSignedUrlRequest
 		{
 			BucketName = _options.BucketName,
 			Key = key,
 			Verb = HttpVerb.PUT,
-			Expires = expiresAt.UtcDateTime,
+			Expires = DateTime.UtcNow.Add(expiresIn),
 			ContentType = contentType,
 		};
+		request.Headers.ContentLength = sizeBytes;
 
-		var url = _s3.GetPreSignedURLAsync(request);
-
-		return url;
+		return _s3.GetPreSignedURLAsync(request);
 	}
 
 	public Task<PresignedUpload> GetUploadUrlAsync(

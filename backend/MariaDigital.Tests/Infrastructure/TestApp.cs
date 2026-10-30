@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using MariaDigital.Application;
 using MariaDigital.Controllers;
 using MariaDigital.Domain.Admin;
 using MariaDigital.Infrastructure.Persistance;
@@ -25,6 +26,9 @@ public sealed class TestApp : WebApplicationFactory<Program>
 	public const string AdminPassword = "correct-horse-battery-staple";
 
 	private readonly SqliteConnection _connection = new("DataSource=:memory:");
+
+	/// <summary>Stands in for R2; inspect <see cref="FakeObjectStorage.PresignCalls"/>.</summary>
+	public FakeObjectStorage Storage { get; } = new();
 
 	public TestApp()
 	{
@@ -60,6 +64,9 @@ public sealed class TestApp : WebApplicationFactory<Program>
 			services.RemoveAll<DbContextOptions<AppDbContext>>();
 			services.RemoveAll<IDbContextOptionsConfiguration<AppDbContext>>();
 			services.AddDbContext<AppDbContext>(options => options.UseSqlite(_connection));
+
+			services.RemoveAll<IObjectStorage>();
+			services.AddSingleton<IObjectStorage>(Storage);
 		});
 	}
 
