@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
+using MariaDigital.Application.Services;
 using MariaDigital.Domain.Admin;
+using MariaDigital.Infrastructure.ObjectStorage;
 using MariaDigital.Infrastructure.Persistance;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -87,9 +89,26 @@ builder.Services.AddRateLimiter(options =>
 				}
 			)
 	);
+	// The limiter runs before authentication, so this is partitioned by IP, like "login".
+	options.AddPolicy(
+		"presign",
+		context =>
+			RateLimitPartition.GetFixedWindowLimiter(
+				context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+				_ => new FixedWindowRateLimiterOptions
+				{
+					PermitLimit = 10,
+					Window = TimeSpan.FromMinutes(1),
+					QueueLimit = 0,
+					AutoReplenishment = true,
+				}
+			)
+	);
 	options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 builder.Services.AddScoped<IPasswordHasher<Admin>, PasswordHasher<Admin>>();
+builder.Services.AddR2ObjectStorage(builder.Configuration);
+builder.Services.AddScoped<PresignedUploadService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
