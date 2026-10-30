@@ -12,6 +12,37 @@ public sealed class EndpointSecurityTests : IDisposable
 
 	public void Dispose() => _app.Dispose();
 
+	// The GET check below cannot see a public POST, so the full list of anonymous endpoints is pinned
+	// here. Opening a new one must be a deliberate edit of this list.
+	[Fact]
+	public void Only_the_intended_endpoints_are_anonymous()
+	{
+		var anonymous = _app
+			.Services.GetServices<EndpointDataSource>()
+			.SelectMany(source => source.Endpoints)
+			.OfType<RouteEndpoint>()
+			.Where(endpoint => endpoint.Metadata.GetMetadata<IAllowAnonymous>() is not null)
+			.SelectMany(endpoint =>
+				endpoint
+					.Metadata.GetMetadata<HttpMethodMetadata>()!
+					.HttpMethods.Select(method =>
+						$"{method} /{endpoint.RoutePattern.RawText!.TrimStart('/')}"
+					)
+			)
+			.Order()
+			.ToList();
+
+		Assert.Equal(
+			[
+				"GET /api/auth/csrf",
+				"POST /api/auth/login",
+				// Signed by the Cloudflare Worker (HMAC); no browser session or CSRF token.
+				"POST /api/internal/uploads/confirmed",
+			],
+			anonymous
+		);
+	}
+
 	// Every endpoint is admin-only unless it opts out with [AllowAnonymous]. This catches a new
 	// endpoint that is accidentally public, or an opt-out that should not be there.
 	[Fact]

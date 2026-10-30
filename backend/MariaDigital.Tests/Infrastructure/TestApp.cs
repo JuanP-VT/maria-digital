@@ -24,6 +24,7 @@ public sealed class TestApp : WebApplicationFactory<Program>
 	public const string AdminEmail = "admin@parroquia.mx";
 	public const string AdminName = "Padre Juan";
 	public const string AdminPassword = "correct-horse-battery-staple";
+	public const string WebhookSecret = "test-webhook-secret-0123456789-abcdef";
 
 	private readonly SqliteConnection _connection = new("DataSource=:memory:");
 
@@ -55,6 +56,7 @@ public sealed class TestApp : WebApplicationFactory<Program>
 						["AdminBootstrap:Email"] = null,
 						["AdminBootstrap:Name"] = null,
 						["AdminBootstrap:Password"] = null,
+						["UploadWebhook:Secret"] = WebhookSecret,
 					}
 				)
 		);

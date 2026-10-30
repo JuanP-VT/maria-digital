@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
 using MariaDigital.Application.Services;
+using MariaDigital.Controllers;
 using MariaDigital.Domain.Admin;
 using MariaDigital.Infrastructure.ObjectStorage;
+using MariaDigital.Infrastructure.Options;
 using MariaDigital.Infrastructure.Persistance;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -104,11 +106,30 @@ builder.Services.AddRateLimiter(options =>
 				}
 			)
 	);
+	// Generous: the Worker confirms up to a batch of objects at once, and retries.
+	options.AddPolicy(
+		"webhook",
+		context =>
+			RateLimitPartition.GetFixedWindowLimiter(
+				context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+				_ => new FixedWindowRateLimiterOptions
+				{
+					PermitLimit = 300,
+					Window = TimeSpan.FromMinutes(1),
+					QueueLimit = 0,
+					AutoReplenishment = true,
+				}
+			)
+	);
 	options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 builder.Services.AddScoped<IPasswordHasher<Admin>, PasswordHasher<Admin>>();
 builder.Services.AddR2ObjectStorage(builder.Configuration);
 builder.Services.AddScoped<PresignedUploadService>();
+builder.Services.AddScoped<UploadConfirmationService>();
+builder
+	.Services.AddOptions<UploadWebhookOptions>()
+	.Bind(builder.Configuration.GetSection(UploadWebhookOptions.SectionName));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -172,7 +193,11 @@ app.Use(
 			|| HttpMethods.IsPut(context.Request.Method)
 			|| HttpMethods.IsPatch(context.Request.Method)
 			|| HttpMethods.IsDelete(context.Request.Method);
-		if (isMutation && context.Request.Path.StartsWithSegments("/api"))
+		// The Worker has no browser session; its endpoint is authenticated by an HMAC signature.
+		var isSignedWebhook = context.Request.Path.Equals(
+			UploadConfirmationsController.ConfirmedPath
+		);
+		if (isMutation && !isSignedWebhook && context.Request.Path.StartsWithSegments("/api"))
 		{
 			try
 			{
