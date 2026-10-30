@@ -38,3 +38,8 @@ Short records of choices that shaped the project, so they are not reopened by ac
 ## Testability as a design constraint
 - **Decision:** Logic is extracted into small pure functions; controllers, services and components stay thin. Most code gets a test.
 - **Why:** The project is built largely with AI assistance, and tests are the safety net that lets generated code be accepted quickly.
+
+## Presigned uploads: server-owned keys, signed type and size
+- **Decision:** `POST /api/uploads/presign` (admin-only) validates the files, saves `Pending` `StudentDocuments` rows, then returns 5-minute presigned PUT URLs. The server generates every storage key; the client sends only type, content type and size. Content type and length are part of the signature.
+- **Why:** The student does not exist yet at upload time (a later job reads the registration sheet), so files are grouped by a `SubmissionId`. A leaked or tampered URL can only write one object of the declared type and size, once, for a few minutes. The URL is created only after its row exists.
+- **Consequence:** Rows stay `Pending` until a Cloudflare Worker confirms the upload (not built yet). The bucket must stay private and its CORS must allow `PUT` only from the app origin. Unconfirmed rows are capped per hour to bound abuse.
