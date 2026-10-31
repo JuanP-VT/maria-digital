@@ -30,6 +30,22 @@ public class OllamaOptionsTests
 	}
 
 	[Fact]
+	public void Resolve_IgnoresFlagsWhenPickingTheModel()
+	{
+		var options = OllamaOptions.Resolve(["--chat", "from-arg"], Env());
+
+		Assert.Equal("from-arg", options.Model);
+	}
+
+	[Fact]
+	public void Resolve_BlankArgumentFallsBackToEnvironmentModel()
+	{
+		var options = OllamaOptions.Resolve([" "], Env(("OLLAMA_MODEL", "from-env")));
+
+		Assert.Equal("from-env", options.Model);
+	}
+
+	[Fact]
 	public void Resolve_UsesDefaultBaseUrl()
 	{
 		var options = OllamaOptions.Resolve(["m"], Env());

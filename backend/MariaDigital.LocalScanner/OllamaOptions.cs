@@ -6,8 +6,12 @@ public record OllamaOptions(string BaseUrl, string Model)
 
 	public static OllamaOptions Resolve(string[] args, Func<string, string?> getEnv)
 	{
-		var model =
-			args.FirstOrDefault(a => !string.IsNullOrWhiteSpace(a)) ?? getEnv("OLLAMA_MODEL");
+		var model = CliArgs.Parse(args).Model;
+		if (string.IsNullOrWhiteSpace(model))
+		{
+			model = getEnv("OLLAMA_MODEL");
+		}
+
 		if (string.IsNullOrWhiteSpace(model))
 		{
 			throw new ArgumentException(
