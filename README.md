@@ -155,6 +155,34 @@ npx wrangler deploy
 
 `API_BASE_URL` can be the frontend origin: the host already proxies `/api/*` to the backend. Requests are signed with HMAC-SHA256 over `{timestamp}.{body}` and rejected after 5 minutes, and the endpoint is closed (503) until `UploadWebhook__Secret` is set. To replay messages that reached the dead-letter queue (for example after a wrong secret), attach a consumer to `guadalupe-uploads-dlq` temporarily or move them back with the Cloudflare dashboard.
 
+### Local queue poller (dev)
+
+Testing the Worker against real buckets is awkward, so `backend/MariaDigital.QueuePoller` does the same job from your machine: it pulls `guadalupe-uploads` through the Cloudflare Queues HTTP API and sends the same signed `POST /api/internal/uploads/confirmed` to your local backend. A queue accepts only one consumer type, so while the poller runs the Worker's consumer must be removed. **Production confirmations pause until you restore it.**
+
+```bash
+npx wrangler queues consumer remove guadalupe-uploads guadalupe-upload-confirmer
+npx wrangler queues consumer http add guadalupe-uploads --batch-size 10 --message-retries 8 --dead-letter-queue guadalupe-uploads-dlq
+```
+
+Set these environment variables (the queue id comes from `npx wrangler queues list`; the token needs Queues read and write):
+
+- `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `QUEUE_ID`
+- `UploadWebhook__Secret`: same value as the local backend's (at least 32 characters)
+- Optional: `API_BASE_URL` (default `https://localhost:7028`), `POLL_INTERVAL_SECONDS` (3), `BATCH_SIZE` (10), `VISIBILITY_TIMEOUT_MS` (30000)
+
+Then, from `backend/`, with the API running:
+
+```bash
+dotnet run --project MariaDigital.QueuePoller
+```
+
+Press Ctrl+C to stop. Restore the Worker afterwards:
+
+```bash
+npx wrangler queues consumer http remove guadalupe-uploads
+npx wrangler deploy   # from worker/, re-attaches the push consumer
+```
+
 ### Admin Authentication Deployment
 
 The admin dashboard uses an `HttpOnly`, secure session cookie. The frontend and API may run on different providers or in different regions, but production should expose the API under the frontend's origin at `/api/*` using the frontend host's rewrite/proxy feature. The browser then makes same-origin requests while the proxy forwards them to the backend over HTTPS. Do not point browser requests directly at an unrelated API domain; modern browsers may block its cross-site cookies.

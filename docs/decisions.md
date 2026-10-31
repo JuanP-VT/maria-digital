@@ -55,6 +55,10 @@ Short records of choices that shaped the project, so they are not reopened by ac
 - **Retries:** Only a 2xx settles a message; everything else (including 401/403/404) is retried with exponential backoff and jitter (5s up to 10 min), 8 attempts, then the dead-letter queue. A 30s request timeout covers a sleeping free-tier backend. Unreadable messages and non-create events are acknowledged.
 - **Consequence:** This is the one deliberate exception to "mutating `/api` requests need a CSRF token" and to "endpoints are admin-only": the exact path `/api/internal/uploads/confirmed` skips the antiforgery check and is `[AllowAnonymous]`, and the signature replaces both. `EndpointSecurityTests` pins the list of anonymous endpoints so any other opening is a deliberate edit. Rotating the secret means changing it on the Worker and the backend together; messages that failed meanwhile wait in the dead-letter queue.
 
+## Dev queue poller replaces the Worker consumer temporarily
+- **Decision:** `backend/MariaDigital.QueuePoller` is a dev-only console tool that pulls `guadalupe-uploads` over the Cloudflare Queues HTTP API and sends the same signed webhook the Worker sends, using the backend's own `WebhookSignature.Sign`. Parsing and backoff are ports of `worker/src/message.ts` and `retry.ts`.
+- **Why:** Running the Worker against real buckets is slow to iterate on. The poller exercises the same backend path from a local debugger. It needs no R2 access: the Worker only uses `key` and `size` from the event.
+- **Consequence:** A queue allows one consumer type, so the HTTP pull consumer replaces the Worker's push consumer while it is in use, and production confirmations pause until the Worker is re-attached (steps in the README). Keep the ports in sync if the Worker's message handling changes.
 
 ## Extraction runs locally, pulled by a console job
 - **Decision:** Scanning of Done candidates runs on an admin's own machine with a local vision model served by Ollama (`backend/MariaDigital.LocalScanner`), instead of sending sheets to OpenAI. The job is started on demand and pulls work from the API; the cloud never calls the PC.
