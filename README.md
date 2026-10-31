@@ -163,6 +163,16 @@ Configure the backend's `ConnectionStrings__DefaultConnection` and provision the
 
 If the backend runs more than one instance, configure ASP.NET Core Data Protection to persist its key ring in shared durable storage accessible to every instance. Keep the application name set to `GuadalupeDigital` (or configure the same `DataProtection__ApplicationName` everywhere). Without shared keys, sessions created by one instance will not be readable by another and will be lost on restarts.
 
+### Local scanner (Ollama)
+
+`backend/MariaDigital.LocalScanner` is a console job that runs on an admin's own machine, so sheets with minors' data never go to a cloud LLM. Install [Ollama](https://ollama.com), pull a vision model (`ollama pull <model>`; check `ollama list`), then from `backend/`:
+
+```bash
+dotnet run --project MariaDigital.LocalScanner -- <model>
+```
+
+It starts `ollama serve` if it is not running, checks the model is installed and opens a chat prompt (`exit` to quit). The model can also come from `OLLAMA_MODEL`, and the server URL from `OLLAMA_URL` (default `http://localhost:11434`).
+
 ---
 
 ## 🗺️ Roadmap
