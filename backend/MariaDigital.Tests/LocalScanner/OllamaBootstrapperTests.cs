@@ -127,6 +127,20 @@ public class OllamaBootstrapperTests
 	}
 
 	[Fact]
+	public async Task RequestTimeout_IsTreatedAsNotRunning()
+	{
+		var server = new FakeServer();
+		var handler = new StubHandler(call =>
+			call == 0 ? throw new TaskCanceledException("timeout") : Ok()
+		);
+		var bootstrapper = Create(handler, server);
+
+		await bootstrapper.EnsureReadyAsync(Options, CancellationToken.None);
+
+		Assert.Equal(1, server.Starts);
+	}
+
+	[Fact]
 	public async Task ErrorStatus_IsTreatedAsNotRunning()
 	{
 		var server = new FakeServer();
