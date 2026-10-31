@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="MariaDigital.Tests/MariaDigital.Tests.csproj" />
   <Project Path="MariaDigital.LocalScanner/MariaDigital.LocalScanner.csproj" />
+  <Project Path="MariaDigital.QueuePoller/MariaDigital.QueuePoller.csproj" />
   <Project Path="MariaDigital/MariaDigital.csproj" />
 </Solution>

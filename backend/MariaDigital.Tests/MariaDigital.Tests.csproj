@@ -23,5 +23,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\MariaDigital\MariaDigital.csproj" />
 		<ProjectReference Include="..\MariaDigital.LocalScanner\MariaDigital.LocalScanner.csproj" />
+		<ProjectReference Include="..\MariaDigital.QueuePoller\MariaDigital.QueuePoller.csproj" />
 	</ItemGroup>
 </Project>
