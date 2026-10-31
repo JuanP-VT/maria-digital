@@ -97,3 +97,6 @@ coverage/
 backend/MariaDigital/appsettings.Local.json
 # Claude Code personal settings
 .claude/settings.local.json
+
+# Sample registration sheet photo (minors personal data), never commit
+/Test.jpeg
